@@ -1,0 +1,19 @@
+- hosts: localhost
+  tasks:
+  - name: set up a task that will fail
+    ansible.builtin.command: 'mkdir /home/ubuntu/failfolder'
+    ignore_errors: True
+  - name: create config
+    become: True
+    copy:
+      content: 'contents of the file'
+      dest: /etc/pamconfig
+      state: present
+      mode: '644'
+    register: configvar
+  - name: print a message
+    debug:
+      msg: "below is a variable"
+  - name:
+    debug: 
+      var: configvar

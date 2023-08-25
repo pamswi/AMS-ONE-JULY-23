@@ -1,0 +1,9 @@
+all:
+  children:
+    test:
+      hosts:
+        ec2-13-40-159-155.eu-west-2.compute.amazonaws.com:
+        ec2-35-177-59-98.eu-west-2.compute.amazonaws.com:
+      vars:
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: '~/awstry.pem'

@@ -1,0 +1,54 @@
+- hosts: localhost
+  connection: local
+  become: true
+  tasks:
+  - name: install nginx
+    apt:
+      name: nginx
+      state: present
+      update_cache: true
+    register: nginx_info
+
+  # Make the "install nginx" task fail if the update cache time is bigger than 1.
+  # - name: print nginx_info
+  #   debug: 
+  #     msg: "{{ nginx_info.cache_update_time }}"
+  #   failed_when: nginx_info.cache_update_time > 1
+
+   # copy our nginx.conf file to the relevant place
+  - name: Copy nginx file over
+    copy:
+      src: nginx.conf
+      dest: /etc/nginx/nginx.conf
+
+    # get the playbook to only run the task if the path before and after are the same 
+    # when: src == dest  
+    # failed_when: src == dest 
+    register: nginx_config
+
+   # Get the playbook to fail on the "Copy nginx file over" task if the path before and after are the same
+  - name: fail if src and dest are the same
+    fail:
+      msg: "source and destination are the same"
+    when: nginx_config.changed == true 
+
+    # restart NGINX to take in the new changes.
+  - name: Restart nginx if needed
+    service:
+      name: nginx
+      state: restarted
+    # NGINX will only be restarted if the copy command (that has been registered as a variable) made a change, otherwise theres no need to restart.  
+    when: nginx_config.changed == true
+
+  - name: Show info from "Copy nginx file over" 
+    debug:
+      var: nginx_config
+
+  - name: Uninstall playbook
+    hosts: localhost
+    become: True
+    tasks:
+    - name: uninstall nginx
+      apt:
+        name: nginx
+        state: absent

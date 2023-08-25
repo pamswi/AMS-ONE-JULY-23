@@ -1,0 +1,26 @@
+# the hosts property sets which machines Ansible will run the plays on
+
+# play level settings
+  # list of tasks level
+    # module level settings 
+- hosts: localhost
+  # all tasks done as the root user : `become: True`
+  tasks:
+    - name: install nginx with apt
+      become: True # task will run as root user 
+    # module name
+      ansible.builtin.apt: 
+      # module arguments 
+      name: nginx
+      state: present
+    - name: create user directory
+      # module name
+      ansible.builtin.file:
+      # module arguments
+      path: /home/ubuntu/
+      state: directory
+    - name: restart nginx
+    become: True # task will run as root user
+      ansible.builtin.systemd_service:
+      name: nginx
+      state: restarted
